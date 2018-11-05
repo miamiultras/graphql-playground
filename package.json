@@ -1,0 +1,12 @@
+{
+  "name": "graphql-playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/miamiultras/graphql-playground.git",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-graphql": "^0.7.1",
+    "graphql": "^14.0.2"
+  }
+}

@@ -5,7 +5,6 @@ const graphqlHTTP = require('express-graphql');
 const {
   GraphQLSchema,
   GraphQLObjectType,
-  GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLID,
@@ -14,27 +13,16 @@ const {
   GraphQLBoolean,
 } = require('graphql');
 const { getVideoById, getVideos, createVideo } = require('./data');
-const nodeInterface = require('./node');
 
 const PORT = process.env.PORT || 3000;
 const server = express();
-
-// const instructorType = new GraphQLObjectType({
-//   fields: {
-//     id: {
-//       type: GraphQLID,
-//       description: ''
-//     },
-//   },
-//   interfaces: [nodeInterface],
-// });
 
 const videoType = new GraphQLObjectType({
   name: 'Video',
   description: 'A video on Egghead.io',
   fields: {
     id: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: GraphQLID,
       description: 'The id of the video.',
     },
     title: {
@@ -50,10 +38,7 @@ const videoType = new GraphQLObjectType({
       description: 'Whether or not the viewer has watched the video.'
     },
   },
-  // The goal for this interface is to be able to use it anytime we have shared fields between types.
-  interfaces: [nodeInterface],
 });
-exports.videoType = videoType;
 
 const queryType = new GraphQLObjectType({
   name: 'QueryType',
@@ -76,24 +61,6 @@ const queryType = new GraphQLObjectType({
   },
 });
 
-const videoInputType = new GraphQLInputObjectType({
-  name: 'VideoInput',
-  fields: {
-    title: {
-      type: new GraphQLNonNull(GraphQLString),
-      description: 'The title of the video.'
-    },
-    duration: {
-      type: new GraphQLNonNull(GraphQLInt),
-      description: 'The duration of the video (in seconds).'
-    },
-    watched: {
-      type: new GraphQLNonNull(GraphQLBoolean),
-      description: 'Whether or not the viewer has watched the video.'
-    },
-  },
-});
-
 const mutationType = new GraphQLObjectType({
   name: 'Mutation',
   description: 'The root Mutation type',
@@ -101,11 +68,20 @@ const mutationType = new GraphQLObjectType({
     createVideo: {
       type: videoType,
       args: {
-        video: {
-          type: new GraphQLNonNull(videoInputType),
-        }
+        title: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'The title of the video.'
+        },
+        duration: {
+          type: new GraphQLNonNull(GraphQLInt),
+          description: 'The duration of the video (in seconds).'
+        },
+        watched: {
+          type: new GraphQLNonNull(GraphQLBoolean),
+          description: 'Whether or not the viewer has watched the video.'
+        },
       },
-      resolve: (_, args) => createVideo(args.video),
+      resolve: (_, args) => createVideo(args),
     },
   },
 });
